@@ -1,1 +1,0 @@
-TruncatedPermutation::<p3_poseidon2::Poseidon2<p3_monty_31::monty_31::MontyField31<BabyBearParameters>, p3_monty_31::aarch64_neon::poseidon2::Poseidon2ExternalLayerMonty31<BabyBearParameters, 16>, p3_monty_31::aarch64_neon::poseidon2::Poseidon2InternalLayerMonty31<BabyBearParameters, 16, BabyBearInternalLayerParameters>, 16, 7>, 8, 8, 16>::new

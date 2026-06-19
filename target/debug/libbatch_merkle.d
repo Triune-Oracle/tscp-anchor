@@ -1,1 +1,0 @@
-/data/data/com.termux/files/home/tscp-anchor/target/debug/libbatch_merkle.rlib: /data/data/com.termux/files/home/tscp-anchor/crates/batch-merkle/src/commit.rs /data/data/com.termux/files/home/tscp-anchor/crates/batch-merkle/src/lib.rs
