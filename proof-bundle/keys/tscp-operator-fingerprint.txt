@@ -1,0 +1,6 @@
+pub   rsa4096 2026-06-24 [SC] [expires: 2028-06-23]
+      901E EB9E B4A9 F380 ABCA  41D0 7A69 CA58 234E 4798
+uid           [ultimate] SEAN CHRISTOPHER SOUTHWICK (I come to drink the weight of the sun in blood) <toolintell@gmail.com>
+sub   rsa4096 2026-06-24 [E] [expires: 2028-06-23]
+      33AA ECCC D34E FD1D 4D53  C8CE FA62 962A B69A B034
+
