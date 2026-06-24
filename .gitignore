@@ -4,3 +4,14 @@ node_modules
 crates/oracle-layer/target/
 .env
 target/
+
+# Rust
+target/
+
+# Node
+node_modules/
+
+# local secrets
+.env
+*.pem
+*.key
