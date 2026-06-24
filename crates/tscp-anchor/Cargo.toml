@@ -1,0 +1,9 @@
+[package]
+name = "tscp-anchor"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+tscp-kernel = { path = "../tscp-kernel" }
+serde = { version = "1.0", features = ["derive"] }
+sha2 = "0.10"

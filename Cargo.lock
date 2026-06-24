@@ -1511,6 +1511,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "tscp-anchor"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "sha2",
+ "tscp-kernel",
+]
+
+[[package]]
 name = "tscp-cli"
 version = "0.1.0"
 dependencies = [
