@@ -1,0 +1,56 @@
+tag v0.1-event-algebra
+Tagger: seansanguis <seansanguis@users.noreply.github.com>
+Date:   Tue Jun 23 22:57:04 2026 -0700
+
+TSCP event algebra frozen
+-----BEGIN PGP SIGNATURE-----
+
+iQJPBAABCAA5FiEEkB7rnrSp84CrykHQemnKWCNOR5gFAmo7cbAbFIAAAAAABAAO
+bWFudTIsMi41KzEuMTEsMywyAAoJEHppylgjTkeYeW0QAKlAb9r6ntEY5FnGqRAT
+mCObD5BLEeh/emSRwg52iW5eYpqJa/s6abDWmnQm5GT/wKLH5f2ackTFQUtRvOOU
+BquqSaQNum7HsvO1lFx/D3ZGofOWEjjiwGD/LqmaHf+08OI9BE39rpFybofVP4lR
+pGgr5mxcbZ2xcc0ICfyRud1aNDTP1Bw1NZIzWTI0LrDU9honFmLqGJj+7BLFBdya
++fKLYrC1y0owHKz74MO2mrUuKaYQX5w/DKTA2HtNNiCOvoMR4EAoUTCS8CgEAzaB
+w5CoZcYy+m2F2J93/S8cPgFkcI4NXTdEHM284yrg6XVUHSY9219hHr2LpGGEJStm
+UTZ/RwzqaRryebQU8mHGyhyyZPJavEX1hUZVG4CZzQBeZ+zeJBltIHSc4UgNCZxw
+5Xzc4IIgfQyiEqdq8b/nbyvGgYwDc78TBd5OabhQM0WJKgwhT3w9N20RVbLcQDJ2
+2/kqTTsjTnVWi3UzaLvyNbhgho5YUU0rk49XySaFIITqv+WkDiC6YFHOmcZH+Kyg
+moTtO6gfuLr1h29qHRws8cJZqdkVgS56OGM5+3SWPhsbuD03CMDYjCngLmoMy5T8
+Q/7bD7Veuwe1ger3ZA7I9owwXLBnYfc7sr3doLISeGaXXdY2qTcY7QWrzPucdz9G
+llNCYJISRQfU+iRkgJv/CF8M
+=LI4c
+-----END PGP SIGNATURE-----
+
+commit 7f5e7ae7dc537088b6b1338de42f52b79ff5918a
+Author: seansanguis <seansanguis@users.noreply.github.com>
+Date:   Tue Jun 23 22:55:19 2026 -0700
+
+    docs: freeze TSCP event algebra v1
+
+diff --git a/crates/tscp-kernel/src/event_algebra.rs b/crates/tscp-kernel/src/event_algebra.rs
+new file mode 100644
+index 00000000..c7a785a8
+--- /dev/null
++++ b/crates/tscp-kernel/src/event_algebra.rs
+@@ -0,0 +1,11 @@
++//! TSCP Event Algebra V1
++//!
++//! Frozen compatibility layer.
++//! This module does not redefine runtime semantics.
++
++pub use crate::event::EventEnvelope;
++
++pub type EventId = [u8; 16];
++pub type StateHash = [u8; 32];
++
++pub const GENESIS_STATE: StateHash = [0u8; 32];
+diff --git a/crates/tscp-kernel/src/lib.rs b/crates/tscp-kernel/src/lib.rs
+index 5520fae5..4c158136 100644
+--- a/crates/tscp-kernel/src/lib.rs
++++ b/crates/tscp-kernel/src/lib.rs
+@@ -4,3 +4,5 @@ pub mod event;
+ pub mod transition;
+ pub mod replay;
+ pub mod serialization;
++
++pub mod event_algebra;
