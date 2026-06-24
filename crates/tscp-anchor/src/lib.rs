@@ -29,3 +29,5 @@ impl Anchor {
         AnchoredReceipt::new(receipt)
     }
 }
+pub mod batch;
+pub use batch::BatchAnchor;

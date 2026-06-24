@@ -1,95 +1,28 @@
-use std::env;
-use std::fs;
-
-use tscp_kernel::{
-    event::EventEnvelope,
-    replay::ReplayEngine,
-};
+use tscp_kernel::{event::EventEnvelope, replay::ReplayEngine, types::GENESIS_STATE};
+use tscp_anchor::Anchor;
 
 fn main() {
-    let args: Vec<String> = env::args().collect();
-
-    match args.get(1).map(|s| s.as_str()) {
-        Some("produce") => produce(&args),
-
-        Some("replay") => {
-            let path = args.get(2)
-                .expect("usage: tscp-cli replay <events.cbor>");
-
-            println!("replaying {}", path);
-
-            let bytes = fs::read(path)
-                .expect("failed reading event file");
-
-            let events: Vec<EventEnvelope> =
-                serde_cbor::from_slice(&bytes)
-                    .expect("invalid cbor");
-
-            let receipts =
-                ReplayEngine::replay(&events, 1)
-                    .expect("replay failed");
-
-            println!("replay successful");
-            println!("receipts: {}", receipts.len());
-            println!(
-                "final_state: {:?}",
-                receipts.last()
-                    .map(|r| r.child_state_hash)
-            );
-        }
-
-        _ => {
-            eprintln!(
-                "usage:\n\
-                 tscp-cli produce --count N --seed X\n\
-                 tscp-cli replay FILE"
-            );
-        }
-    }
-}
-
-
-fn produce(args: &[String]) {
-    let count: usize = arg_value(args, "--count")
-        .unwrap_or("10")
-        .parse()
-        .unwrap();
-
-    let seed: u8 = arg_value(args, "--seed")
-        .unwrap_or("1")
-        .parse()
-        .unwrap();
+    println!("TSCP CLI v0.1 - Kernel→Anchor pipe");
 
     let mut engine = ReplayEngine::new(1);
-    let mut events = Vec::new();
+    let mut parent = GENESIS_STATE;
 
-    for i in 0..count {
+    for i in 1..=3 {
         let event = EventEnvelope {
-            event_id: [seed.wrapping_add(i as u8); 16],
-            parent_state_hash: engine.current_hash(),
-            payload_hash: [seed.wrapping_add(i as u8); 32],
+            event_id: [i; 16],
+            parent_state_hash: parent,
+            payload_hash: [i+10; 32],
             logical_time: i as u64,
         };
 
-        engine.apply(&event)
-            .expect("transition failed");
+        let receipt = engine.apply(&event).unwrap();
+        parent = receipt.child_state_hash; // chain it!
 
-        events.push(event);
+        let anchored = Anchor::anchor_receipt(receipt.clone());
+
+        println!("\nEvent {}:", i);
+        println!(" receipt.hash: {:x?}", &anchored.receipt_hash[..8]);
+        println!(" proof: {:x?}", &anchored.stark_proof[..8]);
+        println!(" verify: {}", anchored.verify());
     }
-
-    let bytes = serde_cbor::to_vec(&events)
-        .expect("encode failed");
-
-    fs::write("events.cbor", bytes)
-        .expect("write failed");
-
-    println!("wrote events.cbor");
-    println!("events: {}", count);
-}
-
-
-fn arg_value<'a>(args: &'a [String], key: &str) -> Option<&'a str> {
-    args.windows(2)
-        .find(|w| w[0] == key)
-        .map(|w| w[1].as_str())
 }
