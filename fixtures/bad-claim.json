@@ -1,0 +1,13 @@
+{
+  "protocol": {
+    "name": "TSCP",
+    "version": "1.0"
+  },
+  "engine": {
+    "name": "plonky3",
+    "version": "0.6.1"
+  },
+  "claim_hash": "not-a-hash",
+  "proof_payload": "test-proof",
+  "metadata_hash": null
+}
