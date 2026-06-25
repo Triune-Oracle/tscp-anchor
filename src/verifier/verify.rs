@@ -1,4 +1,4 @@
-use crate::verifier::backend::{StubVerifier, Verifier};
+use crate::verifier::backend::{AnchorVerifier, Verifier};
 use crate::verifier::reason::ReasonCode;
 use crate::verifier::types::{ProofEnvelope, VerifyResult};
 
@@ -18,9 +18,7 @@ pub fn verify(envelope: &ProofEnvelope) -> VerifyResult {
         return VerifyResult::fail(ReasonCode::UnsupportedEngine);
     }
 
-    if !envelope.claim_hash.starts_with("sha256:")
-        || envelope.claim_hash.len() != 71
-    {
+    if !envelope.claim_hash.starts_with("sha256:") {
         return VerifyResult::fail(ReasonCode::RejectBinding);
     }
 
@@ -28,7 +26,7 @@ pub fn verify(envelope: &ProofEnvelope) -> VerifyResult {
         return VerifyResult::fail(ReasonCode::RejectSchema);
     }
 
-    let backend = StubVerifier;
+    let backend = AnchorVerifier;
 
     match backend.verify(envelope) {
         Ok(()) => VerifyResult::pass(),

@@ -1,20 +1,20 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::verifier::reason::ReasonCode;
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Protocol {
     pub name: String,
     pub version: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct Engine {
     pub name: String,
     pub version: String,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Deserialize)]
 pub struct ProofEnvelope {
     pub protocol: Protocol,
     pub engine: Engine,
