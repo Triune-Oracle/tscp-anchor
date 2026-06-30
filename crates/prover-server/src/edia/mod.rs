@@ -1,4 +1,13 @@
 use std::sync::atomic::AtomicU64;
+pub mod admission;
+#[derive(Debug, Clone)]
+pub struct EdiaSnapshot {
+    pub pending_requests: u64,
+    pub completed_proofs: u64,
+    pub avg_proof_ms: u64,
+    pub last_proof_ms: u64,
+    pub invariant_holds: bool,
+}
 use std::sync::Arc;
 use tokio::sync::Mutex;
 
