@@ -250,6 +250,7 @@ async fn prove_handler(
     let claim_u64: u64 = claimed_sum.as_canonical_u64();
     let envelope = ProofEnvelope::seal_061(claim_u64, payload);
 
+    state.metrics.total_proof_time_ns.fetch_add(start.elapsed().as_nanos() as u64, std::sync::atomic::Ordering::Relaxed);
     (
         StatusCode::OK,
         Json(SealedProofResponse {
