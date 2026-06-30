@@ -80,7 +80,6 @@ impl Drop for EdiaGuard {
     }
 }
 
-use std::sync::atomic::{AtomicU64, Ordering};
 
 pub struct AdmissionMetrics {
     pub admitted: AtomicU64,
