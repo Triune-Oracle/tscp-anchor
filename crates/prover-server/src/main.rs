@@ -5,7 +5,7 @@ use axum::{
     extract::{Json, State},
     http::StatusCode,
     response::IntoResponse,
-    routing::post,
+    routing::{post, get},
     Router,
 };
 use owsl_bridge::owsl_permits_verification;
@@ -85,6 +85,7 @@ async fn main() {
     };
     let app = Router::new()
         .route("/prove/sumcheck", post(prove_handler))
+    .route("/metrics", get(metrics_handler))
         .with_state(state);
     let addr = SocketAddr::from(([127, 0, 0, 1], 3030));
     let listener = tokio::net::TcpListener::bind(addr)
@@ -167,6 +168,8 @@ async fn prove_handler(
                 .into_response();
         }
     };
+
+    let start = std::time::Instant::now();
 
     // Phase 1 admission accounting: semaphore is the authority.
     let _edia_guard = {
@@ -440,4 +443,25 @@ mod tests {
             "verifying with a transcript seeded from different public inputs must fail"
         );
     }
+}
+
+async fn metrics_handler(State(state): State<AppState>) -> impl IntoResponse {
+    use std::sync::atomic::Ordering;
+    let m = &state.metrics;
+    let admitted = m.admitted.load(Ordering::Relaxed);
+    let completed = m.completed.load(Ordering::Relaxed);
+    let rejected = m.rejected.load(Ordering::Relaxed);
+    let inflight = m.inflight.load(Ordering::Relaxed);
+    let peak = m.peak.load(Ordering::Relaxed);
+    let total_ns = m.total_proof_time_ns.load(Ordering::Relaxed);
+    let avg_ms = if completed > 0 { total_ns / completed / 1_000_000 } else { 0 };
+    Json(serde_json::json!({
+        "admitted": admitted,
+        "completed": completed,
+        "rejected": rejected,
+        "inflight": inflight,
+        "peak_concurrent": peak,
+        "avg_proof_ms": avg_ms,
+        "invariant_holds": admitted == completed + inflight + rejected
+    }))
 }
