@@ -1,0 +1,28 @@
+{
+  "_schema": "tscp-acceptance-evidence-v1",
+  "artifact": "tscp-mini-ntt-parity-v1",
+  "commit": "9a9411b57fcc4bd9a9f78524b5ccf027e4a558d8",
+  "workflow": "TSCP mini-NTT acceptance",
+  "status": "PASS",
+  "checks": [
+    "python vector_generator.py",
+    "python verify.py",
+    "sha256sum -c SHA256SUMS"
+  ],
+  "checks_passed": 24,
+  "checks_failed": 0,
+  "sha256_manifest": "2c9125388a2b08c70596f03f06af39e5435841c901e919f6820fbd36a9c5f0d3",
+  "_sha256_manifest_note": "sha256(SHA256SUMS) \u2014 seals the primary artifact manifest. SHA256SUMS does not include this file.",
+  "timestamp": "2026-07-18T22:00:52Z",
+  "field": "BabyBear (p = 2013265921 = 15 * 2^27 + 1)",
+  "vectors_covered": [
+    "n8",
+    "n16"
+  ],
+  "provenance": {
+    "generator": "vector_generator.py",
+    "verifier": "verify.py",
+    "integrity_manifest": "SHA256SUMS",
+    "execution_record": "verification.log"
+  }
+}
