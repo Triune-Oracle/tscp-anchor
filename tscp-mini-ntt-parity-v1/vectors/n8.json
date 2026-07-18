@@ -1,0 +1,46 @@
+{
+  "_schema": "tscp-ntt-parity-vector-v1",
+  "_label": "n8",
+  "_date": "2026-07-18",
+  "_field": "BabyBear (p = 2013265921 = 15 * 2^27 + 1)",
+  "_algorithm": "Cooley-Tukey DIT NTT, natural-order input, natural-order output",
+  "_seed": "TSCP-MINI-NTT-PARITY-V1",
+  "n": 8,
+  "omega": 1592366214,
+  "omega_inv": 1801542727,
+  "n_inv": 1761607681,
+  "inputs": [
+    1066800928,
+    1578862042,
+    1258469253,
+    220164117,
+    920489279,
+    74210038,
+    485350147,
+    134626805
+  ],
+  "ntt_outputs": [
+    1712440767,
+    1428326330,
+    802787230,
+    66018216,
+    1723246605,
+    1310814307,
+    1697420305,
+    1806619585
+  ],
+  "intt_of_inputs": [
+    465713336,
+    1987435129,
+    1973785219,
+    1422142989,
+    970380546,
+    8252277,
+    603664884,
+    1688490232
+  ],
+  "invariants_verified": {
+    "parity": true,
+    "linearity": true
+  }
+}

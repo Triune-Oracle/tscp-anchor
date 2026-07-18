@@ -1,0 +1,20 @@
+{
+  "_schema": "tscp-execution-record-v1",
+  "_date": "2026-07-18",
+  "_executor": "Solas / Base44 sandbox (Python 3)",
+  "commands": [
+    "python vector_generator.py",
+    "python verify.py",
+    "sha256sum -c SHA256SUMS"
+  ],
+  "result": "VERIFICATION_PACKAGE_PASS",
+  "checks_passed": 24,
+  "checks_failed": 0,
+  "sha256sums": {
+    "constants.json": "338688a6ff1463e1f8fc14061a5ee4b8ec69ef5b62f968c10ac1efb8e96dcd9f",
+    "vectors/n8.json": "13a165b2de5891136f5f4c3b040b88f55c1d157a4a916eb248841680803e70dc",
+    "vectors/n16.json": "d5c25d4545e6cd3a10fe9c7144c760584fa0f536072e08b65e35329eb0cde071",
+    "vector_generator.py": "c4dc3199e69eb8a726df6f032bc52e06275e6eeb4ffee30ed3465a6d24310631",
+    "verify.py": "0acbb90cf40b0fba230c5649400b769f7f154bb26515abe711c86f254f7337db"
+  }
+}
