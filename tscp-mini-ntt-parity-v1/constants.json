@@ -1,0 +1,52 @@
+{
+  "_comment": "BabyBear prime field constants for NTT over F_p where p = 15 * 2^27 + 1",
+  "_schema_version": "1.0.0",
+  "_produced_by": "tscp-mini-ntt-parity-v1",
+  "_date": "2026-07-18",
+  "_verification": "All values computed and independently checked — see derivation notes",
+
+  "prime": 2013265921,
+  "prime_hex": "0x78000001",
+  "prime_factored": "15 * 2^27 + 1",
+
+  "primitive_root": 31,
+  "_primitive_root_verification": {
+    "g_pow_p_minus_1_over_2": 2013265920,
+    "g_pow_p_minus_1_over_3": 1314723123,
+    "g_pow_p_minus_1_over_5": 645581151,
+    "conclusion": "All three != 1 mod p — 31 is a primitive root mod 2013265921"
+  },
+
+  "multiplicative_group_order": 2013265920,
+  "two_adicity": 27,
+  "_two_adicity_note": "p - 1 = 15 * 2^27, so the 2-adic valuation is 27",
+
+  "omega_n8": 1592366214,
+  "_omega_n8_derivation": "31^((p-1)/8) mod p = 31^251658240 mod p",
+  "_omega_n8_checks": {
+    "omega_n8_pow_8_eq_1": true,
+    "omega_n8_pow_4_neq_1": true
+  },
+
+  "omega_n16": 196396260,
+  "_omega_n16_derivation": "31^((p-1)/16) mod p = 31^125829120 mod p",
+  "_omega_n16_checks": {
+    "omega_n16_pow_16_eq_1": true,
+    "omega_n16_pow_8_neq_1": true
+  },
+
+  "omega_n8_inv": 1801542727,
+  "_omega_n8_inv_check": "1592366214 * 1801542727 == 1 mod p",
+
+  "omega_n16_inv": 567209306,
+  "_omega_n16_inv_check": "196396260 * 567209306 == 1 mod p",
+
+  "n8_inv": 1761607681,
+  "_n8_inv_check": "8 * 1761607681 == 1 mod p",
+
+  "n16_inv": 1887436801,
+  "_n16_inv_check": "16 * 1887436801 == 1 mod p",
+
+  "test_vector_seed": "TSCP-MINI-NTT-PARITY-V1",
+  "_test_vector_seed_note": "Deterministic input generation seed for cross-implementation reproducibility"
+}
