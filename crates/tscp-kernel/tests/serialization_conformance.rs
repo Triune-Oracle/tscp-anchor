@@ -164,7 +164,11 @@ fn test_mutation_changes_hash() {
 
     let mut r2 = r.clone();
     r2.kind = TransitionKind::ClaimVerified;
-    assert_ne!(h_original, receipt_hash(&r2), "kind change must change hash");
+    assert_ne!(
+        h_original,
+        receipt_hash(&r2),
+        "kind change must change hash"
+    );
 }
 
 /// #4 negative: mutation detection is always enforced — exhaustive bit-flip
@@ -212,9 +216,15 @@ fn test_different_domains_different_hashes() {
     let r = sample_receipt();
     let h = receipt_hash(&r);
 
-    assert_ne!(h, r.parent_state_hash, "hash must not equal parent_state_hash");
+    assert_ne!(
+        h, r.parent_state_hash,
+        "hash must not equal parent_state_hash"
+    );
     assert_ne!(h, r.event_hash, "hash must not equal event_hash");
-    assert_ne!(h, r.child_state_hash, "hash must not equal child_state_hash");
+    assert_ne!(
+        h, r.child_state_hash,
+        "hash must not equal child_state_hash"
+    );
 
     let mut r2 = r.clone();
     r2.kernel_version = 2;
@@ -267,7 +277,10 @@ fn test_cross_domain_no_collision() {
         r2.kind = TransitionKind::ClaimVerified;
         receipt_hash(&r2)
     };
-    assert_ne!(h_created, h_verified, "different kind must produce different hash");
+    assert_ne!(
+        h_created, h_verified,
+        "different kind must produce different hash"
+    );
 }
 
 // ─── Predicate 6: Toolchain Reproducibility ───────────────────────────────
