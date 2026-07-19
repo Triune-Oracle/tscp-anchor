@@ -1,7 +1,7 @@
 # Identity Seal: tscp-serialization-v0.1
 
 **Status:** VERIFIED
-**Sealed:** 2026-07-18T22:15:00Z
+**Sealed:** 2026-07-19T15:45:00Z
 **Authority:** Cartilage-Stairwells Verification Authority
 
 ## Verification Result
@@ -30,30 +30,30 @@ All seven verification predicates defined in CONTRACT.md have been satisfied.
 | Artifact | SHA-256 |
 |---|---|
 | Verification run log | `4db5f5919603926b3b4ed9e8792c4233a1a3dcb3d9220663f7a6db76b64f6019` |
-| Test suite (serialization_conformance.rs) | `e13fd5d0c0ba1ff4301efe6900feed37cf500f1bcec633a39ce12383e406f475` |
+| Test suite (serialization_conformance.rs) | `d760e03958199c4afd9d0fda0c5638ef42efe3cbedab5028a27cf458e1f6ebd8` |
 | serialization.rs | `676563d082490dcdd69787446da2e5279917ef97f97047371be817b9ea4da8b6` |
 | types.rs | `c538f9440f94ab64652ef7cc0f06dc1ba4e08d95ecf09a38aa307bd7258f468e` |
 
-## Change note (2026-07-18)
+## Change note (2026-07-19)
 
-The test suite and types.rs were updated to fix two reviewer findings:
+Test suite updated to fix two remaining issues identified in CI review:
 
-1. **P1 #2 — Serde strict rejection:** Added `#[serde(deny_unknown_fields)]` to
-   `TransitionReceipt`. Updated `test_custody_expression_blocked` to construct a real
-   CBOR payload with a "custody" field and assert rejection (not just round-trip stability).
+1. **cargo fmt compliance:** All test functions reformatted to nightly rustfmt
+   style — trailing commas, consistent assert spacing, no alignment padding.
 
-2. **P2 #4 — Mutation test overclaim:** Corrected the doc comment on
-   `test_mutation_always_detected` to accurately state that it covers exhaustive bit-flip
-   mutation across the 96 hash-field bytes only. The `kernel_version` and `kind` fields
-   are covered by `test_mutation_changes_hash`.
-
-The verification run log hash was already correct in SHA256SUMS. The seal had an
-internal inconsistency (stale hash `34d55c12...`). This regeneration corrects it.
+2. **Custody rejection test correctness:** `test_custody_expression_blocked`
+   now uses binary CBOR stream mutation rather than `serde_cbor::Value` map
+   construction. The valid serialized receipt (0xA5 map header = 5 fields) is
+   patched to 0xA6 (6 fields) and a CBOR-encoded ("custody", "approve") pair
+   is appended. This exercises `deny_unknown_fields` against a structurally
+   valid CBOR payload with the correct field encoding — not a type-mismatch
+   rejection. The test now proves the invariant rather than passing for the
+   wrong reason.
 
 ## Scope
 
 This seal certifies artifact identity verification only.
-It does NOT imply VERIFIED_CUSTODY. Custody carries independent predicates
+It does NOT imply VERIFIED\_CUSTODY. Custody carries independent predicates
 and is not inherited from artifact identity verification.
 
 ## Transition
@@ -65,7 +65,7 @@ FROZEN_SPECIFICATION
         ↓
 VERIFICATION_PACKAGE_PASS
         ↓
-VERIFIED_ARTIFACT_IDENTITY ← sealed 2026-07-18T22:15:00Z
+VERIFIED_ARTIFACT_IDENTITY ← sealed 2026-07-19T15:45:00Z
 ```
 
 ---
