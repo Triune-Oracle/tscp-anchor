@@ -20,7 +20,7 @@
 namespace TSCP.CustodyPlane
 
 /- Algebra version binding: FCO_TRANSITION_ALGEBRA.md
-    Hash: f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998
+    Hash: 53fb4b5a093f7539587be2fc7703f482ac0f5c23c9bbdc89f9ef7614b7df7cda
     This Lean model targets the algebra specification at that hash.
     Conformance is established by `decide` proofs, not by this declaration. -/
 

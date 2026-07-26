@@ -1,10 +1,10 @@
 # FCO Transition Algebra Specification
 ## TSCP Custody Plane — Canonical Formal Document
 
-**Version:** 1.0
+**Version:** 1.1
 **Date:** 2026-07-26
 **Status:** Sealed (evidence surface — not authority surface)
-**Commit:** 579cc02
+**Commit:** ebc4b0e
 
 ---
 
@@ -307,6 +307,9 @@ The external verifier re-derives §3, §4, and §5 from the JSON matrix without 
 - `verify_reachability` checks §4 (BFS from each custody category)
 - `verify_constraint_schema` checks §6.5 (constraints are const:false)
 - `verify_firewall_consistency` checks §5.1 (custody→authority forbidden, authority→custody permitted)
+- `verify_algebra_version_binding` checks §11 (identity, integrity, cross-implementation consistency)
+
+The verifier performs 7 checks, each mapped to a specific section of this algebra. See §11 for the five-stage custody chain that classifies these checks by the question they answer.
 
 ---
 
@@ -366,3 +369,117 @@ Any modification to this document requires:
 6. New commit with evidence of all changes
 
 The algebra is frozen. Changes to the invariant (§4) are architectural changes, not implementation changes, and require the full custody chain to be re-verified.
+
+---
+
+## 11. Five-Stage Custody Chain
+
+### 11.1 The Separation
+
+The relationship between this specification and its implementations involves four concepts that are often conflated but must remain distinct:
+
+| Concept | Role | Established by |
+|---|---|---|
+| Specification | Defines the transition model | This algebra document |
+| Identity | States which specification an implementation targets | Embedded algebra hash |
+| Integrity | Verifies the embedded hash is authentic and unmodified | Cryptographic verification |
+| Conformance | Demonstrates the implementation matches the specification | Tests, proofs, external verifier |
+| Authority | Exists outside the custody plane | External jurisdiction |
+
+Each concept answers a different question. The questions are intentionally orthogonal.
+
+### 11.2 The Five Stages
+
+```
+Specification
+      ↓
+Identity Binding
+      ↓
+Integrity Verification
+      ↓
+Conformance Evidence
+      ↓
+External Reproduction
+```
+
+| Stage | Question | Established by | Failure mode |
+|---|---|---|---|
+| Specification | What is the model? | This document | Ambiguity in definitions |
+| Identity Binding | Which model is this targeting? | Embedded hash | Wrong version declared |
+| Integrity Verification | Is the binding authentic? | SHA-256 check | Hash tampered or document modified |
+| Conformance Evidence | Does the implementation satisfy the model? | Tests, proofs | Implementation diverges from spec |
+| External Reproduction | Can an independent verifier agree? | External verifier | Verifier cannot reproduce results |
+
+### 11.3 Orthogonality
+
+The stages are orthogonal: each can pass or fail independently.
+
+**Identity without Conformance:** An implementation declares the correct algebra hash but fails its tests. The declaration is honest; the implementation is broken.
+
+**Conformance without Identity:** An implementation passes all tests but declares the wrong version hash. The behavior is correct; the lineage is broken.
+
+**Integrity without Conformance:** The embedded hash matches the algebra document, but the implementation does not satisfy the algebra. The binding is authentic; the conformance is absent.
+
+**Conformance without Integrity:** The implementation satisfies the algebra, but the embedded hash has been tampered with. The behavior is correct; the provenance is broken.
+
+These are diagnostically distinct failure modes. Treating them as a single pass/fail collapses the ability to locate the source of a problem.
+
+### 11.4 What a Matching Hash Establishes
+
+A matching hash establishes **identity**: "This implementation claims to target algebra hash f3901b24..."
+
+Cryptographic verification of the hash against the document establishes **integrity**: "The embedded hash has not been altered and matches the specification document."
+
+Neither, by itself, establishes **conformance**: "This implementation behaves according to that algebra."
+
+Conformance still depends on the independent evidence produced by:
+- Transition matrix completeness check (25/25 entries)
+- Rust test suite (9 tests)
+- Lean compilation (0 errors, 0 sorry)
+- Python test suite (32 assertions)
+- External verifier (7 checks from first principles)
+
+### 11.5 Mapping to External Verifier Checks
+
+| Verifier Check | Stage | Question Answered |
+|---|---|---|
+| Check 1: Matrix completeness | Conformance | Does the matrix have all 25 entries? |
+| Check 2: Plane separation | Conformance | Are custody→authority transitions forbidden? |
+| Check 3: Reachability (BFS) | Conformance | Is authority unreachable from custody? |
+| Check 4: Constraint schema | Conformance | Are all constraints const:false? |
+| Check 5: Receipt schema | Conformance | Is the receipt evidence, not authority? |
+| Check 6: Firewall consistency | Conformance | Are forbidden transitions actually forbidden? |
+| Check 7: Algebra version binding | Identity + Integrity | Do all implementations target the same version, and does the hash match the document? |
+
+Check 7 is the only check that spans two stages (identity and integrity). Checks 1-6 are conformance checks. External reproduction is the act of running the verifier itself.
+
+### 11.6 The Prohibited Conflation
+
+The following equalities would collapse distinct responsibilities:
+
+$$	ext{Specification} 
+eq 	ext{Authority}$$
+
+The specification defines the model. Authority exists outside the custody plane.
+
+$$	ext{Binding} 
+eq 	ext{Conformance}$$
+
+Declaring a target version is not the same as satisfying it.
+
+$$	ext{Declaration} 
+eq 	ext{Proof}$$
+
+Stating "I target algebra v1.1" is not evidence that the implementation conforms to v1.1.
+
+$$	ext{Identity} 
+eq 	ext{Integrity}$$
+
+Declaring the correct hash is not the same as the hash being authentic and unmodified.
+
+$$	ext{Integrity} 
+eq 	ext{Conformance}$$
+
+An authentic, unmodified hash binding does not mean the implementation satisfies the specification.
+
+Preserving these separations makes it easier to reason about failures. An implementation can have the correct identity binding yet fail conformance, or it can conform behaviorally while accidentally declaring the wrong specification version. Treating these as distinct custody states improves diagnostics without expanding the FCO's role beyond structural verification.

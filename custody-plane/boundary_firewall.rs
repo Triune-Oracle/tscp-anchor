@@ -11,12 +11,12 @@
 
 // ── Algebra Version Binding ─────────────────────────────────────────────────
 // This implementation targets FCO_TRANSITION_ALGEBRA.md
-// Hash: f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998
+// Hash: 53fb4b5a093f7539587be2fc7703f482ac0f5c23c9bbdc89f9ef7614b7df7cda
 // The external verifier checks that this hash matches the algebra document.
 // This binding does NOT prove conformance — it declares the target.
 // Conformance is established by tests, not by this constant.
 #[allow(dead_code)]
-const ALGEBRA_VERSION: &str = "f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998";
+const ALGEBRA_VERSION: &str = "53fb4b5a093f7539587be2fc7703f482ac0f5c23c9bbdc89f9ef7614b7df7cda";
 
 
 use std::collections::{HashMap, HashSet};
