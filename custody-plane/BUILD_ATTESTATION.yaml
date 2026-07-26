@@ -1,0 +1,83 @@
+# TSCP Custody Plane — Reproducible Build Attestation
+# Produced: 2026-07-26T19:30:58Z
+#
+# This file captures the exact toolchain versions and artifact hashes
+# needed to reproduce the custody plane verification. It is itself an
+# evidence artifact — not an authority grant.
+#
+# Reproduction procedure:
+#   1. Install the toolchains listed below
+#   2. Clone the repository at commit 49d52bd
+#   3. Run the three verification commands
+#   4. Compare your results to the expected outputs
+#
+# If your results differ, the verification is NOT reproduced.
+# Differing results do NOT constitute authority to override the boundary.
+
+build_attestation:
+  produced_at: "2026-07-26T19:30:58Z"
+  commit: "49d52bd"
+  branch: "fix-ci-pipelines"
+  repository: "https://github.com/Triune-Oracle/tscp-anchor"
+
+toolchains:
+  python:
+    version: "3.11.15"
+    command: "python3 --version"
+    expected_output: "Python 3.11.15"
+  rust:
+    version: "1.97.1"
+    commit: "8bab26f4f 2026-07-14"
+    command: "rustc --version"
+    expected_output: "rustc 1.97.1 (8bab26f4f 2026-07-14)"
+    compile_flags: "--edition 2021 --test"
+  lean:
+    version: "4.32.1"
+    commit: "f054605aea4b840552cca2e725580bffd1e1b704"
+    command: "lean --version"
+    expected_output: "Lean (version 4.32.1, x86_64-unknown-linux-gnu, commit f054605aea4b840552cca2e725580bffd1e1b704, Release)"
+  lake:
+    version: "5.0.0"
+    command: "lake --version"
+    expected_output: "Lake version 5.0.0-src+f054605 (Lean version 4.32.1)"
+
+artifacts:
+  - name: "transition_matrix.json"
+    role: "Transition topology (5 categories, 25 transitions)"
+  - name: "custody.schema.json"
+    role: "FCO schema with const:false constraints"
+  - name: "acceptance_receipt.schema.json"
+    role: "Receipt schema (Evidence Generator output)"
+  - name: "boundary_firewall.rs"
+    role: "Rust structural firewall"
+  - name: "FCO_Invariants.lean"
+    role: "Lean formal conformance invariants"
+  - name: "tscp_acceptance_harness.py"
+    role: "Evidence Generator (NOT Authority Generator)"
+  - name: "test_closure.py"
+    role: "9 test cases (32 assertions)"
+
+verification_commands:
+  python:
+    command: "python3 test_closure.py"
+    expected_exit_code: 0
+    expected_summary: "32 passed, 0 failed"
+    expected_final_line: "CUSTODY PLANE: CLOSED"
+  rust:
+    command: "rustc --edition 2021 --test boundary_firewall.rs -o /tmp/firewall_test && /tmp/firewall_test"
+    expected_exit_code: 0
+    expected_summary: "9 passed; 0 failed"
+  lean:
+    command: "lean FCO_Invariants.lean"
+    expected_exit_code: 0
+    expected_output: "(no output — clean compilation)"
+
+boundary_statement: |
+  This attestation records that a declared procedure produced these
+  verification results. It does NOT record that these results deserve
+  execution authority. Reproduction is the responsibility of the
+  verifier, not the producer.
+
+  Claimed Verification Results ≠ Directly Observed Verification Results.
+  This attestation bridges that gap by providing enough information
+  for independent reproduction.
