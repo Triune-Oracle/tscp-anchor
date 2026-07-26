@@ -166,6 +166,85 @@ def verify_firewall_consistency(matrix):
     return len(violations) == 0, violations
 
 
+
+def verify_algebra_version_binding(artifacts_dir, matrix, custody_schema, receipt_schema):
+    """Check that all implementations declare the same algebra version.
+
+    The algebra version is the SHA-256 hash of FCO_TRANSITION_ALGEBRA.md.
+    Each implementation embeds this hash as a declaration of what it targets.
+    This does NOT prove conformance — it creates traceable lineage.
+
+    Conformance is established by:
+      - transition_matrix.json: completeness check (Check 1)
+      - boundary_firewall.rs: Rust test suite (9 tests)
+      - FCO_Invariants.lean: Lean compilation (0 errors, 0 sorry)
+      - tscp_acceptance_harness.py: Python test suite (32 assertions)
+    """
+    import re
+
+    violations = []
+    expected_hash = None
+
+    # 1. Check transition_matrix.json
+    matrix_hash = matrix.get("algebra_version")
+    if not matrix_hash:
+        violations.append("transition_matrix.json: missing algebra_version field")
+    else:
+        expected_hash = matrix_hash
+
+    # 2. Check boundary_firewall.rs
+    with open(os.path.join(artifacts_dir, "boundary_firewall.rs")) as f:
+        rust_src = f.read()
+    rust_match = re.search(r'ALGEBRA_VERSION:\s*&str\s*=\s*"([0-9a-f]+)"', rust_src)
+    if not rust_match:
+        violations.append("boundary_firewall.rs: missing ALGEBRA_VERSION constant")
+    elif expected_hash and rust_match.group(1) != expected_hash:
+        violations.append(
+            f"boundary_firewall.rs: algebra version mismatch "
+            f"(expected {expected_hash[:16]}..., got {rust_match.group(1)[:16]}...)"
+        )
+
+    # 3. Check FCO_Invariants.lean
+    with open(os.path.join(artifacts_dir, "FCO_Invariants.lean")) as f:
+        lean_src = f.read()
+    lean_match = re.search(r'Hash:\s*([0-9a-f]+)', lean_src)
+    if not lean_match:
+        violations.append("FCO_Invariants.lean: missing algebra hash comment")
+    elif expected_hash and lean_match.group(1) != expected_hash:
+        violations.append(
+            f"FCO_Invariants.lean: algebra version mismatch "
+            f"(expected {expected_hash[:16]}..., got {lean_match.group(1)[:16]}...)"
+        )
+
+    # 4. Check tscp_acceptance_harness.py
+    with open(os.path.join(artifacts_dir, "tscp_acceptance_harness.py")) as f:
+        py_src = f.read()
+    py_match = re.search(r'ALGEBRA_VERSION\s*=\s*"([0-9a-f]+)"', py_src)
+    if not py_match:
+        violations.append("tscp_acceptance_harness.py: missing ALGEBRA_VERSION constant")
+    elif expected_hash and py_match.group(1) != expected_hash:
+        violations.append(
+            f"tscp_acceptance_harness.py: algebra version mismatch "
+            f"(expected {expected_hash[:16]}..., got {py_match.group(1)[:16]}...)"
+        )
+
+    # 5. Check that the algebra document exists
+    algebra_path = os.path.join(artifacts_dir, "FCO_TRANSITION_ALGEBRA.md")
+    if not os.path.exists(algebra_path):
+        violations.append("FCO_TRANSITION_ALGEBRA.md: document not found")
+    elif expected_hash:
+        import hashlib
+        with open(algebra_path, "rb") as f:
+            actual_hash = hashlib.sha256(f.read()).hexdigest()
+        if actual_hash != expected_hash:
+            violations.append(
+                f"FCO_TRANSITION_ALGEBRA.md: hash mismatch "
+                f"(expected {expected_hash[:16]}..., computed {actual_hash[:16]}...)"
+            )
+
+    return len(violations) == 0, violations
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="TSCP External Verifier — verify custody plane from first principles"
@@ -254,6 +333,23 @@ def main():
         print(f"  ✓ All custody→authority transitions are forbidden")
         print(f"  ✓ Authority→custody (e.g. Execution→Evidence) is permitted")
         print(f"    (execution produces evidence; evidence does not grant authority)")
+    else:
+        all_clean = False
+        for v in violations:
+            print(f"  ✗ {v}")
+    print()
+
+
+    # Check 7: Algebra version binding
+    print("Check 7: Algebra version binding (all implementations target same version)")
+    clean, violations = verify_algebra_version_binding(d, matrix, custody_schema, receipt_schema)
+    if clean:
+        print(f"  ✓ transition_matrix.json: algebra_version present")
+        print(f"  ✓ boundary_firewall.rs: ALGEBRA_VERSION present")
+        print(f"  ✓ FCO_Invariants.lean: algebra hash present")
+        print(f"  ✓ tscp_acceptance_harness.py: ALGEBRA_VERSION present")
+        print(f"  ✓ FCO_TRANSITION_ALGEBRA.md: hash verified")
+        print(f"  ✓ All implementations target the same algebra version")
     else:
         all_clean = False
         for v in violations:

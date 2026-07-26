@@ -18,6 +18,15 @@ authority was NOT granted, permission was NOT granted, jurisdiction was
 NOT crossed.
 """
 
+# ── Algebra Version Binding ─────────────────────────────────────────────────
+# This implementation targets FCO_TRANSITION_ALGEBRA.md
+# Hash: f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998
+# The external verifier checks that this hash matches the algebra document.
+# This binding does NOT prove conformance — it declares the target.
+# Conformance is established by the test suite, not by this constant.
+ALGEBRA_VERSION = "f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998"
+
+
 import json
 import hashlib
 from datetime import datetime, timezone

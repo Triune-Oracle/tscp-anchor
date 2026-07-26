@@ -8,6 +8,17 @@
 // Classification: Evidence Generator component (NOT an Authority Generator).
 // The firewall reports violations; it does not grant permission.
 
+
+// ── Algebra Version Binding ─────────────────────────────────────────────────
+// This implementation targets FCO_TRANSITION_ALGEBRA.md
+// Hash: f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998
+// The external verifier checks that this hash matches the algebra document.
+// This binding does NOT prove conformance — it declares the target.
+// Conformance is established by tests, not by this constant.
+#[allow(dead_code)]
+const ALGEBRA_VERSION: &str = "f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998";
+
+
 use std::collections::{HashMap, HashSet};
 
 /// A transition in the custody plane topology.

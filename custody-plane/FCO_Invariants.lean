@@ -19,6 +19,12 @@
 
 namespace TSCP.CustodyPlane
 
+/- Algebra version binding: FCO_TRANSITION_ALGEBRA.md
+    Hash: f3901b24857805ad68fdfc8001c2ba90c692a53d7ebcfdd17579e1b0ef3aa998
+    This Lean model targets the algebra specification at that hash.
+    Conformance is established by `decide` proofs, not by this declaration. -/
+
+
 /-- Category in the custody plane topology -/
 inductive Category
   | Custody
