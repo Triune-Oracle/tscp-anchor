@@ -1,0 +1,60 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TSCP Custody Object",
+  "description": "A Formal Custody Object (FCO) — the unit of custody plane transitions",
+  "type": "object",
+  "required": ["category", "content_hash", "lineage", "constraints"],
+  "properties": {
+    "category": {
+      "type": "string",
+      "enum": ["Custody", "Evidence", "AcceptanceReceipt", "Authority", "Execution"],
+      "description": "The LineageDomain category of this object"
+    },
+    "content_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the object content (content-addressed identity)"
+    },
+    "lineage": {
+      "type": "object",
+      "required": ["parent_hash", "transition"],
+      "properties": {
+        "parent_hash": {
+          "type": ["string", "null"],
+          "description": "Content hash of the parent FCO, or null if root"
+        },
+        "transition": {
+          "type": "string",
+          "description": "The transition that produced this object (from→to)"
+        }
+      }
+    },
+    "constraints": {
+      "type": "object",
+      "description": "Constitutional constraints — all must be false (negative assertions)",
+      "properties": {
+        "authority_granted": {
+          "type": "boolean",
+          "const": false,
+          "description": "Authority was NOT granted"
+        },
+        "permission_granted": {
+          "type": "boolean",
+          "const": false,
+          "description": "Permission was NOT granted"
+        },
+        "jurisdiction_crossed": {
+          "type": "boolean",
+          "const": false,
+          "description": "Jurisdiction was NOT crossed"
+        }
+      },
+      "required": ["authority_granted", "permission_granted", "jurisdiction_crossed"]
+    },
+    "payload": {
+      "type": "object",
+      "description": "Domain-specific content of the custody object"
+    }
+  },
+  "additionalProperties": false
+}
