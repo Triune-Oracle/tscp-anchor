@@ -1,0 +1,99 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "TSCP Acceptance Receipt",
+  "description": "A conformance receipt produced by the acceptance harness — an Evidence Generator, NOT an Authority Generator",
+  "type": "object",
+  "required": [
+    "receipt_id",
+    "receipt_hash",
+    "produced_by",
+    "produced_at",
+    "input_fco_hash",
+    "transition_verified",
+    "firewall_result",
+    "reachability_result",
+    "constitutional_constraints",
+    "statement"
+  ],
+  "properties": {
+    "receipt_id": {
+      "type": "string",
+      "description": "Content-addressed receipt identifier"
+    },
+    "receipt_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the receipt content"
+    },
+    "produced_by": {
+      "type": "string",
+      "const": "tscp_acceptance_harness",
+      "description": "Identity of the harness that produced this receipt"
+    },
+    "produced_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 timestamp of receipt production"
+    },
+    "input_fco_hash": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$",
+      "description": "SHA-256 of the input Formal Custody Object"
+    },
+    "transition_verified": {
+      "type": "object",
+      "required": ["from", "to", "allowed"],
+      "properties": {
+        "from": {"type": "string"},
+        "to": {"type": "string"},
+        "allowed": {"type": "boolean"}
+      },
+      "description": "The transition that was verified by the firewall"
+    },
+    "firewall_result": {
+      "type": "object",
+      "required": ["violations", "clean"],
+      "properties": {
+        "violations": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of boundary violations (empty if clean)"
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "True if no violations detected"
+        }
+      }
+    },
+    "reachability_result": {
+      "type": "object",
+      "required": ["authority_reachable", "clean"],
+      "properties": {
+        "authority_reachable": {
+          "type": "boolean",
+          "description": "True if a path to Authority exists (should be false)"
+        },
+        "clean": {
+          "type": "boolean",
+          "description": "True if authority is NOT reachable (should be true)"
+        }
+      }
+    },
+    "constitutional_constraints": {
+      "type": "object",
+      "required": ["authority_granted", "permission_granted", "jurisdiction_crossed"],
+      "properties": {
+        "authority_granted": {"type": "boolean", "const": false},
+        "permission_granted": {"type": "boolean", "const": false},
+        "jurisdiction_crossed": {"type": "boolean", "const": false}
+      },
+      "description": "All constraints must be false — negative assertions that authority was NOT granted"
+    },
+    "statement": {
+      "type": "string",
+      "const": "A declared procedure produced this conformance artifact.",
+      "description": "What the receipt says — NOT 'this artifact deserves execution'"
+    }
+  },
+  "additionalProperties": false
+}
