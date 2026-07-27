@@ -1,0 +1,297 @@
+{
+  "title": "TSCP FCO Receipt Composition Algebra Model",
+  "description": "The declarative model defining how receipts compose without creating authority, matching FCO_RECEIPT_COMPOSITION_ALGEBRA.md",
+  "algebra_version": "53fb4b5a093f7539587be2fc7703f482ac0f5c23c9bbdc89f9ef7614b7df7cda",
+  "algebra_document": "FCO_RECEIPT_COMPOSITION_ALGEBRA.md",
+  
+  "receipt_type": {
+    "description": "Definition of the 7 receipt fields. NO authority field is present.",
+    "fields": {
+      "id": {
+        "type": "string",
+        "format": "sha256",
+        "description": "Content-addressed identity (SHA-256 hash of the receipt content)"
+      },
+      "subject": {
+        "type": "string",
+        "description": "What the receipt is about (e.g., 'NTT backend equivalence')"
+      },
+      "evidence": {
+        "type": "array",
+        "items": {
+          "type": "string",
+          "description": "Artifacts supporting the claim (test logs, hashes, proofs)"
+        },
+        "description": "List of artifacts supporting the claim"
+      },
+      "claim": {
+        "type": "object",
+        "description": "The assertion made by the receipt, supported by dependencies within a specific scope",
+        "properties": {
+          "statement": {
+            "type": "string",
+            "description": "What is asserted"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "What evidence or prior claims support the statement"
+          },
+          "scope": {
+            "type": "string",
+            "description": "The domain or context where the claim applies"
+          }
+        },
+        "required": ["statement", "dependencies", "scope"]
+      },
+      "lineage": {
+        "type": "object",
+        "description": "Directed acyclic graph representing the provenance chain of how this receipt came to exist",
+        "properties": {
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "description": "Receipt IDs in the lineage"
+            }
+          },
+          "edges": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "from": {
+                  "type": "string",
+                  "description": "Origin receipt ID"
+                },
+                "to": {
+                  "type": "string",
+                  "description": "Destination receipt ID (depends on)"
+                }
+              },
+              "required": ["from", "to"]
+            }
+          }
+        },
+        "required": ["nodes", "edges"]
+      },
+      "timestamp": {
+        "type": "string",
+        "format": "date-time",
+        "description": "ISO-8601 representation of when the receipt was produced"
+      },
+      "signature": {
+        "type": "string",
+        "format": "sha256",
+        "description": "Cryptographic commitment to the receipt content"
+      }
+    },
+    "required": [
+      "id",
+      "subject",
+      "evidence",
+      "claim",
+      "lineage",
+      "timestamp",
+      "signature"
+    ]
+  },
+
+  "authority_exclusion": {
+    "theorem": "∀ r ∈ R: Authority(r) = ⊥",
+    "statement": "No field named authority, permission, jurisdiction, execution_rights, or control exists in the receipt type.",
+    "excluded_fields": [
+      "authority",
+      "permission",
+      "jurisdiction",
+      "execution_rights",
+      "control"
+    ],
+    "proof": [
+      "1. The receipt type R is defined as the product of exactly seven fields: id, subject, evidence, claim, lineage, timestamp, signature.",
+      "2. None of these seven fields is authority, permission, jurisdiction, execution_rights, or control.",
+      "3. The only constructor for R produces a tuple of exactly those seven fields.",
+      "4. No field in the tuple has a type or subtype that can carry or represent authority.",
+      "5. Therefore, no receipt can structurally contain authority."
+    ],
+    "composition_preservation": {
+      "theorem": "∀ r1, r2 ∈ R: Authority(r1 ⊕ r2) = ⊥",
+      "proof": "Since the composition operator (⊕) produces a receipt of type R, and type R excludes authority, the composed receipt r3 cannot contain authority. The composition operator preserves the structural type boundary."
+    }
+  },
+
+  "composition": {
+    "operator": "partial",
+    "guards": {
+      "subject_agreement": {
+        "expression": "r1.subject == r2.subject",
+        "description": "Receipts about different subjects cannot compose. This prevents unrelated evidence aggregation."
+      },
+      "claim_consistency": {
+        "expression": "not(contradicts(r1.claim, r2.claim))",
+        "description": "Claims must not contradict. A receipt asserting P cannot compose with a receipt asserting not P."
+      },
+      "lineage_acyclicity": {
+        "expression": "is_acyclic(union(r1.lineage, r2.lineage) + {(r3, r1), (r3, r2)})",
+        "description": "Composition must not create cycles in the lineage graph, preventing circular self-justification."
+      },
+      "evidence_independence": {
+        "expression": "intersection(r1.evidence, r2.evidence) == empty_set or shared_evidence_explicitly_declared(r1.lineage, r2.lineage)",
+        "description": "Evidence sources must be independent. Shared evidence must be explicitly declared in the lineage to avoid hidden self-attestation."
+      }
+    },
+    "result_fields": {
+      "id": {
+        "computation": "SHA-256(content)",
+        "description": "Content-addressed identity (SHA-256 of the composed receipt fields: subject, evidence, claim, lineage, timestamp)"
+      },
+      "subject": {
+        "computation": "r1.subject",
+        "description": "Preserved from component receipts (which are equal via subject_agreement guard)"
+      },
+      "evidence": {
+        "computation": "union(r1.evidence, r2.evidence)",
+        "description": "Set union of the evidence lists from both component receipts"
+      },
+      "claim": {
+        "computation": "r1.claim ∧ r2.claim",
+        "description": "Conjunction of component claims, governed by the claim_structure composition rule"
+      },
+      "lineage": {
+        "computation": "union(r1.lineage.nodes, r2.lineage.nodes, {r3.id}) and union(r1.lineage.edges, r2.lineage.edges, {(r3.id, r1.id), (r3.id, r2.id)})",
+        "description": "A union DAG that adds the new composed receipt ID as a root with directed edges to both components"
+      },
+      "timestamp": {
+        "computation": "max(r1.timestamp, r2.timestamp)",
+        "description": "The latest timestamp among the component receipts"
+      },
+      "signature": {
+        "computation": "SHA-256(composed_content)",
+        "description": "Cryptographic commitment to the composed receipt content"
+      }
+    }
+  },
+
+  "claim_structure": {
+    "fields": {
+      "statement": {
+        "type": "string",
+        "description": "What is asserted by the claim"
+      },
+      "dependencies": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        },
+        "description": "References to evidence supporting the assertion"
+      },
+      "scope": {
+        "type": "string",
+        "description": "The applicability boundary or domain of the claim"
+      }
+    },
+    "composition_rule": {
+      "formula": {
+        "statement": "s1 ∧ s2",
+        "dependencies": "d1 ∪ d2",
+        "scope": "scope1 ∩ scope2"
+      },
+      "description": "The scope intersects (narrows), rather than unions (widens). The composed claim applies only where both component claims apply, preventing automatic strengthening."
+    }
+  },
+
+  "drift_receipt": {
+    "description": "A negative receipt extension representing semantic drift or failure of a property under test.",
+    "extension_fields": {
+      "subject": {
+        "type": "string",
+        "description": "What was tested"
+      },
+      "claim": {
+        "type": "object",
+        "properties": {
+          "statement": {
+            "type": "string",
+            "const": "Property P failed under test T",
+            "description": "Statement representing a test failure assertion"
+          },
+          "dependencies": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Identities of the oracle and test vectors used"
+          },
+          "scope": {
+            "type": "string",
+            "description": "Boundaries or context where the failure applies"
+          }
+        }
+      },
+      "evidence": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "properties": {
+            "test_output": {
+              "type": "string",
+              "description": "Log or stdout of the failed test run"
+            },
+            "oracle_output": {
+              "type": "string",
+              "description": "Output from the reference semantic oracle"
+            },
+            "deviation_measurement": {
+              "type": "string",
+              "description": "Quantified delta or error distance between implementation and reference"
+            },
+            "classification": {
+              "type": "string",
+              "enum": [
+                "ImplementationDrift",
+                "SpecificationDefect",
+                "OracleDefect",
+                "LineageDivergence"
+              ],
+              "description": "Classification of the semantic drift to locate which layer moved (added to evidence items)"
+            }
+          },
+          "required": ["test_output", "oracle_output", "deviation_measurement", "classification"]
+        }
+      },
+      "lineage": {
+        "type": "object",
+        "description": "A combination of the oracle's custody chain and the implementation's custody chain"
+      }
+    }
+  },
+
+  "drift_classification": {
+    "classes": {
+      "ImplementationDrift": {
+        "definition": "Code wrong relative to spec",
+        "description": "The implementation diverged from the formal specification."
+      },
+      "SpecificationDefect": {
+        "definition": "Spec ambiguous",
+        "description": "The specification was unclear, leading to different valid interpretations."
+      },
+      "OracleDefect": {
+        "definition": "Reference wrong",
+        "description": "The semantic oracle or reference model itself contains an error."
+      },
+      "LineageDivergence": {
+        "definition": "Both changed independently",
+        "description": "Both the specification/reference and the implementation changed; neither is incorrect in isolation."
+      }
+    },
+    "composition_rules": [
+      "Negative receipts participate in composition under the same rules.",
+      "Subject agreement must hold (both receipts must address the same subject).",
+      "A negative receipt and a positive receipt about the exact same property under the exact same test are contradictory, making composition undefined.",
+      "A negative receipt about property P under test T1 and a positive receipt about property P under test T2 may compose, because they operate on different scopes (different tests)."
+    ]
+  }
+}
