@@ -198,7 +198,7 @@ An external cryptographic audit has not been performed. The soundness properties
 Scope of current security coverage:
 - Implementation-level soundness: verified via test suite
 - Protocol-level soundness: not formally proven
-- Build environment: not independently reproduced
+- Build environment: workspace tests independently reproduced with Rust 1.96.0; no third-party cryptographic audit claimed
 - Operational security (key management, deployment hardening): not reviewed
 
 This repository is suitable for research evaluation, technical due diligence, and collaborator review. It is not suitable for production deployment without independent audit and operational hardening.
