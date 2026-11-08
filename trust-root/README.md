@@ -47,8 +47,20 @@ same operator, so this raises the cost of a rewrite rather than making one
 impossible. A genuinely independent witness would be a third party, or a public
 append-only log the originator cannot edit. Neither exists yet.
 
-## Current timestamp state, stated honestly
+## Current timestamp state, measured
 
+v1 is Bitcoin-confirmed. Its proof carries attestations in blocks 974947 and
+974953, and both merkle roots were checked against a public block explorer
+independently of the proof itself, so the date is anchored rather than merely
+submitted. The stamped digest is unchanged by the upgrade; upgrading only adds
+attestations.
+
+v2 is still pending on all four calendars. A pending proof is a receipt for a
+submission, not a settled record.
+
+Re-check the `.ots` files for the present state rather than trusting this
+paragraph, and verify any settled block against a block explorer rather than
+against the proof's own claim about itself.
 At the time this mirror was written the proofs were still pending Bitcoin
 confirmation. A pending proof is a receipt for a submission, not a settled
 record. Check the `.ots` files for their present state rather than trusting
