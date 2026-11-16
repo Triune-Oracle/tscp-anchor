@@ -1,3 +1,7 @@
+> **This repository is a pre-migration copy.** The canonical TSCP `tscp-anchor` is [github.com/Cartilage-Stairwells/tscp-anchor](https://github.com/Cartilage-Stairwells/tscp-anchor). `REPOSITORY_CUSTODY_TRANSITION.md` here records a 2026-07-14 intent that has since reversed: Cartilage-Stairwells now holds the canonical TSCP record, code, evidence and continuity, and this repository is retained for provenance. The documentation below predates several corrections standing in the canonical repository and is not current.
+
+---
+
 # tscp-anchor
 
 The **Triune Structured Codex Protocol (TSCP)** is a multi-agent coordination standard that governs state transitions, governance events, and oracle-layer operations across a sovereign AI execution environment. **TSCP Anchor** is its cryptographic proving layer — the component responsible for making every protocol claim independently verifiable.
